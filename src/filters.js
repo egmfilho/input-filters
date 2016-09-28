@@ -7,13 +7,14 @@
 'use strict';
 
 angular.module('egmfilho.inputFilters', [ ])
-  .directive('numberOnly', [function() {
+  .directive('numberOnly', ['$locale', function($locale) {
     return {
 			restrict: 'A',
       require: 'ngModel',
       link: function(scope, element, attr, ngModelCtrl) {
         ngModelCtrl.$parsers.push(function(text) {
-          var transformedInput = text.replace(/[^0-9\,\.]/g, '');
+          var separator = attr.separator ? attr.separator : $locale.NUMBER_FORMATS.DECIMAL_SEP,
+              transformedInput = text.replace(new RegExp('[^0-9' + separator + ']', 'g'), '');
           if (transformedInput !== text) {
             ngModelCtrl.$setViewValue(transformedInput);
             ngModelCtrl.$render();
@@ -24,9 +25,9 @@ angular.module('egmfilho.inputFilters', [ ])
     };
   }])
 	.directive('currency', ['$filter', '$locale', function($filter, $locale) {
-    return {			
+    return {
 			restrict: 'A',
-      require: 'ngModel',			
+      require: 'ngModel',
       link: function(scope, element, attrs, ngModelController) {
         ngModelController.$parsers.push(function(data) {
           // converte o dado no formato da view para o formato do model
