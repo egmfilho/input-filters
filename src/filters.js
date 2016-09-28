@@ -26,15 +26,12 @@ angular.module('egmfilho.inputFilters', [ ])
 	.directive('currency', ['$filter', '$locale', function($filter, $locale) {
     return {			
 			restrict: 'A',
-      require: 'ngModel',	
-			scope: { 
-				symbol: '@'
-			},		
+      require: 'ngModel',			
       link: function(scope, element, attrs, ngModelController) {
         ngModelController.$parsers.push(function(data) {
           // converte o dado no formato da view para o formato do model
           if (data) {
-            return parseFloat(data.toString().replace(scope.symbol || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
+            return parseFloat(data.toString().replace(attrs.symbol || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
 							.replace($locale.NUMBER_FORMATS.GROUP_SEP, '')
 							.replace($locale.NUMBER_FORMATS.DECIMAL_SEP, '.'));
           }
@@ -46,7 +43,7 @@ angular.module('egmfilho.inputFilters', [ ])
           // converte o dado no formato do model para o formato da view
 
           if (data != null) {
-            return $filter('currency')(data, scope.symbol);
+            return $filter('currency')(data, attrs.symbol);
           }
 
           return data;
