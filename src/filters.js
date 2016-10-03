@@ -40,13 +40,17 @@ angular.module('egmfilho.inputFilters', [ ])
           return parseFloat(data);
         });
 
-        ngModelController.$formatters.push(function(data) {
-          // converte o dado no formato do model para o formato da view
+        element.bind('blur', function() {
+          if (ngModelController.$viewValue) {
+            ngModelController.$viewValue = $filter('currency')(ngModelController.$viewValue, attrs.symbol);;
+            ngModelController.$render();
+          }
+        });
 
+        ngModelController.$formatters.push(function(data) {
           if (data != null) {
             return $filter('currency')(data, attrs.symbol);
           }
-
           return data;
         });
       }
