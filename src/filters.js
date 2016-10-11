@@ -25,31 +25,37 @@ angular.module('egmfilho.inputFilters', [ ])
     };
   }])
 	.directive('currency', ['$filter', '$locale', function($filter, $locale) {
+
     return {
 			restrict: 'A',
       require: 'ngModel',
       link: function(scope, element, attrs, ngModelController) {
-        ngModelController.$parsers.push(function(data) {
-          // converte o dado no formato da view para o formato do model
-          if (data) {
-            return parseFloat(data.toString().replace(attrs.symbol || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
-							.replace($locale.NUMBER_FORMATS.GROUP_SEP, '')
-							.replace($locale.NUMBER_FORMATS.DECIMAL_SEP, '.'));
-          }
 
+        function parseToModel(data) {
+          if (data) {
+            return parseFloat(data.toString().replace(scope.$eval(attrs.symbol) || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
+              .replace($locale.NUMBER_FORMATS.GROUP_SEP, '')
+              .replace($locale.NUMBER_FORMATS.DECIMAL_SEP, '.'));
+          }
           return parseFloat(data);
-        });
+        }
+
+        function parseToView(data) {
+          return $filter('currency')(parseToModel(data.replace(scope.$eval(attrs.symbol), '')), scope.$eval(attrs.symbol));
+        }
+
+        ngModelController.$parsers.push(parseToModel);
 
         element.bind('blur', function() {
           if (ngModelController.$viewValue) {
-            ngModelController.$viewValue = $filter('currency')(ngModelController.$viewValue, attrs.symbol);;
+            ngModelController.$viewValue = parseToView(ngModelController.$viewValue);
             ngModelController.$render();
           }
         });
 
         ngModelController.$formatters.push(function(data) {
           if (data != null) {
-            return $filter('currency')(data, attrs.symbol);
+            return parseToView(data.toString());
           }
           return data;
         });
