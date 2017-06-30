@@ -2,7 +2,7 @@
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
 * @Last Modified by:   egmfilho
-* @Last Modified time: 2017-06-12 16:21:47
+* @Last Modified time: 2017-06-30 08:37:53
 */
 
 (function() {
@@ -58,27 +58,36 @@
 
 					var symbol = scope.$eval(attrs.symbol) || '';
 
+					/* From string to float */
 					function parseToModel(data) {
-
-						if (!isNaN(parseFloat(data)) && data.toString().indexOf('.') != -1) {
-							return parseFloat(data);
-						} else {
+						if (!isNaN(parseFloat(data))) {
 							return parseFloat(data.toString().replace(symbol || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
 								.replace($locale.NUMBER_FORMATS.GROUP_SEP, '')
 								.replace($locale.NUMBER_FORMATS.DECIMAL_SEP, '.'));
 						}
 
+						return 0;
 					}
 
-					ngModelController.$parsers.push(parseToModel);
-
+					/* From float to string */
 					function parseToView(data) {
+						var maxFractionSize = attrs.maxFractionSize ? parseInt(attrs.maxFractionSize) : $locale.NUMBER_FORMATS.PATTERNS[1].maxFrac,
+							fractionSize = data.toString().indexOf('.') < 0 ? 0 : data.toString().split('.')[1].length;
+
+						if (attrs.trim && fractionSize < maxFractionSize)
+							maxFractionSize = Math.max(attrs.minFractionSize ? parseInt(attrs.minFractionSize) : $locale.NUMBER_FORMATS.PATTERNS[1].minFrac, fractionSize);
+
 						if (data != null) {
-							return $filter('currency')(parseToModel(data.toString().replace(symbol, '')), symbol);
+							if (maxFractionSize == 0)
+								return symbol + data.toString();
+							else
+								return $filter('currency')(parseToModel(data.toString().replace(symbol, '')), symbol, maxFractionSize);
 						}
+
 						return data;
 					}
 
+					ngModelController.$parsers.push(parseToModel);
 					ngModelController.$formatters.push(parseToView);
 
 					element.bind('blur', function() {
