@@ -2,7 +2,7 @@
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
 * @Last Modified by:   egmfilho
-* @Last Modified time: 2017-06-30 08:37:53
+* @Last Modified time: 2017-07-03 10:22:09
 */
 
 (function() {
@@ -59,6 +59,7 @@
 					var symbol = scope.$eval(attrs.symbol) || '';
 
 					/* From string to float */
+					/* Remove locale currency */
 					function parseToModel(data) {
 						if (!isNaN(parseFloat(data))) {
 							return parseFloat(data.toString().replace(symbol || $locale.NUMBER_FORMATS.CURRENCY_SYM, '')
@@ -71,20 +72,22 @@
 
 					/* From float to string */
 					function parseToView(data) {
+						var model =  !isNaN(data) && angular.isNumber(+data) ? data : parseToModel(data);
+
 						var maxFractionSize = attrs.maxFractionSize ? parseInt(attrs.maxFractionSize) : $locale.NUMBER_FORMATS.PATTERNS[1].maxFrac,
-							fractionSize = data.toString().indexOf('.') < 0 ? 0 : data.toString().split('.')[1].length;
+							fractionSize = model.toString().indexOf('.') < 0 ? 0 : model.toString().split('.')[1].length;
 
 						if (attrs.trim && fractionSize < maxFractionSize)
 							maxFractionSize = Math.max(attrs.minFractionSize ? parseInt(attrs.minFractionSize) : $locale.NUMBER_FORMATS.PATTERNS[1].minFrac, fractionSize);
 
-						if (data != null) {
+						if (model != null) {
 							if (maxFractionSize == 0)
-								return symbol + data.toString();
+								return symbol + model.toString();
 							else
-								return $filter('currency')(parseToModel(data.toString().replace(symbol, '')), symbol, maxFractionSize);
+								return $filter('currency')(model, symbol, maxFractionSize);
 						}
 
-						return data;
+						return model;
 					}
 
 					ngModelController.$parsers.push(parseToModel);
