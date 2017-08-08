@@ -2,7 +2,7 @@
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
 * @Last Modified by:   egmfilho
-* @Last Modified time: 2017-07-03 10:22:09
+* @Last Modified time: 2017-08-08 17:36:40
 */
 
 (function() {
@@ -39,11 +39,32 @@
 				link: function(scope, element, attr, ngModelCtrl) {
 					ngModelCtrl.$parsers.push(function(text) {
 						var separator = attr.separator ? attr.separator : $locale.NUMBER_FORMATS.DECIMAL_SEP,
-						transformedInput = text.replace(new RegExp('[^0-9' + separator + ']', 'g'), '');
+							transformedInput = text.replace(new RegExp('[^0-9' + separator + ']', 'g'), '');
+
 						if (transformedInput !== text) {
 							ngModelCtrl.$setViewValue(transformedInput);
 							ngModelCtrl.$render();
 						}
+						return transformedInput;
+					});
+				}
+			};
+		}])
+		.directive('replaceText', ['$locale', function($locale) {
+			return {
+				restrict: 'A',
+				require: 'ngModel',
+				link: function(scope, element, attr, ngModelCtrl) {
+					ngModelCtrl.$parsers.push(function(text) {
+						var from = attr.replaceFrom,
+							to = attr.replaceTo,
+							transformedInput = text.replace(from, to);
+						
+						if (transformedInput !== text) {
+							ngModelCtrl.$setViewValue(transformedInput);
+							ngModelCtrl.$render();
+						}
+
 						return transformedInput;
 					});
 				}
