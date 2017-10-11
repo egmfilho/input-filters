@@ -2,7 +2,7 @@
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
 * @Last Modified by:   egmfilho
-* @Last Modified time: 2017-09-29 08:12:32
+* @Last Modified time: 2017-10-11 09:08:37
 */
 
 'use strict';
@@ -100,9 +100,9 @@ angular.module('egmfilho.inputFilters', [ ])
 						maxFractionSize = Math.max(attrs.minFractionSize ? parseInt(attrs.minFractionSize) : $locale.NUMBER_FORMATS.PATTERNS[1].minFrac, fractionSize);
 
 					if (model != null) {
-						if (maxFractionSize == 0)
-							return symbol + model.toString();
-						else
+						// if (maxFractionSize == 0)
+						// 	return symbol + model.toString();
+						// else
 							return $filter('currency')(model, symbol, maxFractionSize);
 					}
 
