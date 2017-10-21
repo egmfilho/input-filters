@@ -1,6 +1,6 @@
 {
     "name": "egmfilho-input-filters",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "description": "An AngularJS directives collection which acts as filters on input fields.",
     "author": "https://github.com/egmfilho",
     "main": "./src/filters.js",

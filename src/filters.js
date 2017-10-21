@@ -2,7 +2,7 @@
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
 * @Last Modified by:   egmfilho
-* @Last Modified time: 2017-10-21 16:45:01
+* @Last Modified time: 2017-10-21 19:03:01
 */
 
 'use strict';
@@ -109,9 +109,9 @@ angular.module('egmfilho.inputFilters', [ ])
 				ngModelController.$parsers.push(parseToModel);
 				ngModelController.$formatters.push(parseToView);
 
-				element.bind('blur', function() {
+				element.bind('change', function() {
 					if (ngModelController.$viewValue) {
-						ngModelController.$viewValue = parseToView(ngModelController.$viewValue);
+						ngModelController.$setViewValue(parseToView(ngModelController.$viewValue));
 						ngModelController.$render();
 					}
 				});
