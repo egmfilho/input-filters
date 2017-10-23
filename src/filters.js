@@ -1,8 +1,8 @@
 /*
 * @Author: egmfilho
 * @Date:   2017-06-12 16:20:28
-* @Last Modified by:   egmfilho
-* @Last Modified time: 2017-10-21 16:45:01
+ * @Last Modified by:   egmfilho
+ * @Last Modified time: 2017-10-23 10:59:55
 */
 
 'use strict';
@@ -27,7 +27,7 @@ angular.module('egmfilho.inputFilters', [ ])
 		return {
 			restrict: 'A',
 			link: link
-		}
+		};
 
 	}])
 	.directive('numberOnly', ['$locale', function($locale) {
@@ -54,16 +54,23 @@ angular.module('egmfilho.inputFilters', [ ])
 			require: 'ngModel',
 			link: function(scope, element, attr, ngModelCtrl) {
 				ngModelCtrl.$parsers.push(function(text) {
-					var from = attr.replaceFrom,
-						to = attr.replaceTo,
-						transformedInput = text.replace(from, to);
-					
-					if (transformedInput !== text) {
-						ngModelCtrl.$setViewValue(transformedInput);
-						ngModelCtrl.$render();
+					if (attr.replaceText) {
+						var transformedInput = text,
+							obj = scope.$eval(attr.replaceText);
+
+						for(var x in obj) {
+							transformedInput = transformedInput.replace(x, obj[x]);
+						}
+
+						if (transformedInput !== text) {
+							ngModelCtrl.$setViewValue(transformedInput);
+							ngModelCtrl.$render();
+						}
+
+						return transformedInput;
 					}
 
-					return transformedInput;
+					return text;
 				});
 			}
 		};
@@ -109,9 +116,9 @@ angular.module('egmfilho.inputFilters', [ ])
 				ngModelController.$parsers.push(parseToModel);
 				ngModelController.$formatters.push(parseToView);
 
-				element.bind('blur', function() {
+				element.bind('change', function() {
 					if (ngModelController.$viewValue) {
-						ngModelController.$viewValue = parseToView(ngModelController.$viewValue);
+						ngModelController.$setViewValue(parseToView(ngModelController.$viewValue));
 						ngModelController.$render();
 					}
 				});
