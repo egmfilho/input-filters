@@ -2,7 +2,7 @@
  * @Author: egmfilho
  * @Date:   2017-06-12 16:20:28
  * @Last Modified by:   egmfilho
- * @Last Modified time: 2017-10-24 16:05:08
+ * @Last Modified time: 2017-10-24 16:26:31
 */
 
 'use strict';
@@ -75,13 +75,6 @@ angular.module('egmfilho.inputFilters', [ ])
 				}
 
 				ngModelCtrl.$parsers.push(parse);
-
-				element.bind('paste', function() {
-					if (ngModelCtrl.$viewValue) {
-						ngModelCtrl.$setViewValue(parse(ngModelCtrl.$viewValue));
-						ngModelCtrl.$render();
-					}
-				});
 			}
 		};
 	}])
