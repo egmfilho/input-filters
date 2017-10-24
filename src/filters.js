@@ -2,7 +2,7 @@
  * @Author: egmfilho
  * @Date:   2017-06-12 16:20:28
  * @Last Modified by:   egmfilho
- * @Last Modified time: 2017-10-23 11:03:23
+ * @Last Modified time: 2017-10-24 16:05:08
 */
 
 'use strict';
@@ -11,7 +11,7 @@ angular.module('egmfilho.inputFilters', [ ])
 	.directive('blurTo', ['$timeout', function($timeout) {
 		var blur;
 
-		function link(scope, element, attrs, ctrl) {
+		function link(scope, element, attrs, ngModelCtrl) {
 			element.bind('blur', function(e) {
 				$timeout(function() {
 					var value = scope.$eval(attrs.blurTo);
@@ -53,7 +53,8 @@ angular.module('egmfilho.inputFilters', [ ])
 			restrict: 'A',
 			require: 'ngModel',
 			link: function(scope, element, attr, ngModelCtrl) {
-				ngModelCtrl.$parsers.push(function(text) {
+
+				function parse(text) {
 					if (attr.replaceText) {
 						var transformedInput = text,
 							obj = scope.$eval(attr.replaceText);
@@ -71,6 +72,15 @@ angular.module('egmfilho.inputFilters', [ ])
 					}
 
 					return text;
+				}
+
+				ngModelCtrl.$parsers.push(parse);
+
+				element.bind('paste', function() {
+					if (ngModelCtrl.$viewValue) {
+						ngModelCtrl.$setViewValue(parse(ngModelCtrl.$viewValue));
+						ngModelCtrl.$render();
+					}
 				});
 			}
 		};
@@ -80,7 +90,7 @@ angular.module('egmfilho.inputFilters', [ ])
 		return {
 			restrict: 'A',
 			require: 'ngModel',
-			link: function(scope, element, attrs, ngModelController) {
+			link: function(scope, element, attrs, ngModelCtrl) {
 
 				var symbol = scope.$eval(attrs.symbol) || '';
 
@@ -113,13 +123,13 @@ angular.module('egmfilho.inputFilters', [ ])
 					return model;
 				}
 
-				ngModelController.$parsers.push(parseToModel);
-				ngModelController.$formatters.push(parseToView);
+				ngModelCtrl.$parsers.push(parseToModel);
+				ngModelCtrl.$formatters.push(parseToView);
 
 				element.bind('change', function() {
-					if (ngModelController.$viewValue) {
-						ngModelController.$setViewValue(parseToView(ngModelController.$viewValue));
-						ngModelController.$render();
+					if (ngModelCtrl.$viewValue) {
+						ngModelCtrl.$setViewValue(parseToView(ngModelCtrl.$viewValue));
+						ngModelCtrl.$render();
 					}
 				});
 			}
